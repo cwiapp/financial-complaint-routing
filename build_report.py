@@ -1,8 +1,7 @@
 """Build the stage-1 PDF report with ReportLab.
 
-The report content is a course-project draft. Replace pending team/repository
-fields before submission and keep the evidence numbers tied to the supplied
-data version.
+The report content is a course-project draft. Keep repository references and
+evidence numbers tied to the submitted code and supplied data version.
 """
 
 from __future__ import annotations
@@ -22,7 +21,9 @@ from reportlab.platypus import (
 
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE / "阶段一开题报告_提交版.pdf"
+OUT = HERE / "阶段一开题报告.pdf"
+REPO_URL = "https://github.com/cwiapp/financial-complaint-routing"
+SUBMISSION_TAG = "phase-1-submission"
 FONT = Path(r"C:\Windows\Fonts\msyh.ttc")
 FONT_BOLD = Path(r"C:\Windows\Fonts\msyhbd.ttc")
 pdfmetrics.registerFont(TTFont("MSYH", str(FONT), subfontIndex=0))
@@ -146,6 +147,7 @@ story += [tbl([
     ["项目", "提交信息"],
     ["课程 / 阶段", "Python 与人工智能 / 阶段一"],
     ["团队 / 成员", "杨俊炜、赵煜凡"],
+    ["Git 仓库 URL / 提交标识", f'<link href="{REPO_URL}/tree/{SUBMISSION_TAG}" color="#2463A6">{REPO_URL}</link><br/>{SUBMISSION_TAG}（Git 标签）'],
     ["日期", "2026 年 10 月 12 日"],
 ], [42*mm, 128*mm]), Spacer(1, 6*mm)]
 story += [P("执行摘要", h1)]
@@ -228,7 +230,7 @@ story += [tbl([
     ["阶段 4：集成系统", "提供 CLI 或本地网页：文本输入、类别／转人工输出、日志与异常处理；端到端及集成测试。"],
     ["阶段 5：扩展与审计", "加入验证集确定的拒答阈值、置信度校准、扰动与分组评估、数据漂移与回滚计划；形成最终报告草案。"],
 ], [39*mm, 131*mm])]
-story += [Spacer(1, 2*mm), P("<b>分工：</b>成员为杨俊炜、赵煜凡，具体分工尚未提供。建议分配数据审计、模型与评估、系统集成、文档与演示四项职责；提交前必须填写各成员实际工作、仓库 URL 与 phase-1-submission 的真实 commit/tag。下一阶段完成标准：可重跑同一划分和基线表，并保留失败案例。", small)]
+story += [Spacer(1, 2*mm), P("<b>分工：</b>成员为杨俊炜、赵煜凡，具体分工尚未提供。建议分配数据审计、模型与评估、系统集成、文档与演示四项职责；提交前必须填写各成员实际工作。本报告对应 Git 仓库的 phase-1-submission 标签。下一阶段完成标准：可重跑同一划分和基线表，并保留失败案例。", small)]
 story += [sub("负责任 AI 与使用声明")]
 story += [P("原始叙述可能仍有隐私风险，示例使用人工编写文本，不在日志或报告中展示完整原文。模型只为人工分流提供建议；对拒答、错误分流保留人工纠正路径。不以类别预测推断投诉真伪、公司违法或消费者权益。报告初稿、原型与测试由 OpenAI Codex（GPT-6）辅助生成；数据统计和测试由本地脚本实际执行，团队提交前须逐项复核、理解并按课程政策披露。", small)]
 story += [sub("参考资料（初步）")]

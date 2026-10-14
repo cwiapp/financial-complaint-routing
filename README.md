@@ -26,10 +26,9 @@ python -m unittest -v
 
 ## 目录与提交前待补
 
-- `阶段一开题报告_提交版.pdf`：5 页开题报告，封面成员信息已填写；提交时使用此文件。
-- `阶段一开题报告.pdf`：此前生成的版本，供对照，不用于提交。
+- `阶段一开题报告.pdf`：5 页开题报告，封面成员信息已填写；提交时使用此文件。
 - `prototype.py`：数据流式读取、数据审计、规则分流和评价。
 - `test_prototype.py`：15 个边界及正确性测试。
 - `requirements.txt`：运行依赖说明。
 
-成员为杨俊炜、赵煜凡。团队名称、成员具体分工及远程 Git URL 尚未提供。当前目录已固定本地 `phase-1-submission` 标签；正式提交前还需补充实际分工，并将该标签推送到团队远程仓库。
+成员为杨俊炜、赵煜凡。Git 仓库为 <https://github.com/cwiapp/financial-complaint-routing>，阶段一提交标签为 `phase-1-submission`。团队名称与成员具体分工尚未提供，正式提交前需据实补充。
