@@ -21,7 +21,7 @@ from reportlab.platypus import (
 
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE / "阶段一开题报告.pdf"
+OUT = HERE / "YangZhao_phase1_report.pdf"
 REPO_URL = "https://github.com/cwiapp/financial-complaint-routing"
 SUBMISSION_TAG = "phase-1-submission"
 FONT = Path(r"C:\Windows\Fonts\msyh.ttc")

@@ -1,0 +1,3 @@
+# The audit, model, tests and SVG charts use only the Python standard library.
+# Needed only to rebuild the PDF report:
+reportlab>=4,<5

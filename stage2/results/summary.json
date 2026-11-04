@@ -1,0 +1,910 @@
+{
+  "protocol": {
+    "version": "stage2-v1",
+    "seed": 42,
+    "source_scope": "first 1,048,575 CSV records, matching workbook capacity",
+    "train_period": "through 2026-03-31",
+    "validation_period": "2026-04-01 to 2026-04-30",
+    "test_period": "2026-05-01 to 2026-05-31",
+    "excluded_prior_trial": "2026-06 and later",
+    "leakage_control": "hash normalized narrative across all months; drop cross-label groups; keep earliest row before time split; train-only vocabulary",
+    "feature_policy": "narrative only; redaction placeholder tokens removed; max 5000 tokens",
+    "uncertainty": "95% Wilson intervals for rates; 500 paired-row bootstrap replicates for macro-F1"
+  },
+  "source": {
+    "archive": "complaints.csv.zip",
+    "sha256": "850d5d220285abecb4d4b94ae4c92a8f318476ce14bd0460c3d6361c79ae9694",
+    "rows_read": 1048575,
+    "columns": [
+      "Date received",
+      "Product",
+      "Sub-product",
+      "Issue",
+      "Sub-issue",
+      "Consumer complaint narrative",
+      "Company public response",
+      "Company",
+      "State",
+      "ZIP code",
+      "Tags",
+      "Submitted via",
+      "Date sent to company",
+      "Company response to consumer",
+      "Timely response?",
+      "Complaint ID"
+    ],
+    "missing_counts": {
+      "Date received": 0,
+      "Product": 121,
+      "Sub-product": 139,
+      "Issue": 145,
+      "Sub-issue": 12173,
+      "Consumer complaint narrative": 1031482,
+      "Company public response": 642432,
+      "Company": 0,
+      "State": 1314,
+      "ZIP code": 913,
+      "Tags": 1026565,
+      "Submitted via": 0,
+      "Date sent to company": 39019,
+      "Company response to consumer": 222634,
+      "Timely response?": 0,
+      "Complaint ID": 2390
+    },
+    "product_counts": {
+      "": 121,
+      "Checking or savings account": 13191,
+      "Consumer Loan": 1,
+      "Credit card": 13509,
+      "Credit card or prepaid card": 2,
+      "Credit reporting or other personal consumer reports": 946029,
+      "Credit reporting, credit repair services, or other personal consumer reports": 41,
+      "Debt collection": 53835,
+      "Debt or credit management": 735,
+      "Money transfer, virtual currency, or money service": 5706,
+      "Mortgage": 5139,
+      "Other": 31,
+      "Payday loan, title loan, personal loan, or advance loan": 2777,
+      "Prepaid card": 1084,
+      "Student loan": 2714,
+      "Vehicle loan or lease": 3660
+    },
+    "narrative_product_counts": {
+      "Checking or savings account": 3020,
+      "Credit card": 3009,
+      "Credit reporting or other personal consumer reports": 914,
+      "Credit reporting, credit repair services, or other personal consumer reports": 7,
+      "Debt collection": 5566,
+      "Debt or credit management": 148,
+      "Money transfer, virtual currency, or money service": 1328,
+      "Mortgage": 1082,
+      "Payday loan, title loan, personal loan, or advance loan": 552,
+      "Prepaid card": 197,
+      "Student loan": 455,
+      "Vehicle loan or lease": 815
+    },
+    "nonempty_narratives": 17093,
+    "narrative_rate": 0.016301170636339794,
+    "selected_six_narratives": 14919,
+    "invalid_received_dates": 0,
+    "selected_invalid_received_dates": 0,
+    "received_min": "2014-07-15",
+    "received_max": "2026-07-05",
+    "monthly_records": {
+      "2014-07": 1,
+      "2015-02": 1,
+      "2016-01": 1,
+      "2016-06": 1,
+      "2016-08": 1,
+      "2017-06": 1,
+      "2017-08": 2,
+      "2017-10": 1,
+      "2017-12": 1,
+      "2018-02": 2,
+      "2018-07": 1,
+      "2018-09": 1,
+      "2018-10": 1,
+      "2019-01": 1,
+      "2019-10": 1,
+      "2019-11": 2,
+      "2020-12": 1,
+      "2021-06": 1,
+      "2021-10": 1,
+      "2022-05": 3,
+      "2022-06": 2,
+      "2022-09": 1,
+      "2023-02": 1,
+      "2023-03": 14,
+      "2023-07": 7,
+      "2023-08": 17,
+      "2023-09": 6,
+      "2023-10": 5,
+      "2023-11": 3,
+      "2023-12": 12,
+      "2024-01": 12,
+      "2024-02": 16,
+      "2024-03": 6,
+      "2024-04": 12,
+      "2024-05": 11,
+      "2024-06": 10,
+      "2024-07": 12,
+      "2024-08": 4,
+      "2024-09": 11,
+      "2024-10": 11,
+      "2024-11": 12,
+      "2024-12": 8,
+      "2025-01": 13,
+      "2025-02": 12,
+      "2025-03": 5,
+      "2025-04": 81,
+      "2025-05": 71,
+      "2025-06": 30,
+      "2025-07": 40,
+      "2025-08": 44,
+      "2025-09": 41,
+      "2025-10": 36,
+      "2025-11": 122,
+      "2025-12": 381,
+      "2026-01": 1026,
+      "2026-02": 29834,
+      "2026-03": 105546,
+      "2026-04": 198278,
+      "2026-05": 228557,
+      "2026-06": 344815,
+      "2026-07": 139425
+    },
+    "monthly_narratives": {
+      "2016-01": 1,
+      "2017-06": 1,
+      "2017-08": 2,
+      "2017-12": 1,
+      "2018-02": 1,
+      "2018-07": 1,
+      "2018-09": 1,
+      "2018-10": 1,
+      "2019-11": 1,
+      "2020-12": 1,
+      "2021-06": 1,
+      "2022-05": 1,
+      "2023-03": 3,
+      "2023-08": 3,
+      "2023-09": 3,
+      "2023-11": 1,
+      "2023-12": 6,
+      "2024-01": 1,
+      "2024-02": 2,
+      "2024-05": 1,
+      "2024-06": 2,
+      "2024-08": 1,
+      "2024-09": 2,
+      "2024-11": 3,
+      "2024-12": 2,
+      "2025-01": 3,
+      "2025-02": 4,
+      "2025-03": 1,
+      "2025-04": 38,
+      "2025-05": 29,
+      "2025-06": 6,
+      "2025-07": 17,
+      "2025-08": 14,
+      "2025-09": 11,
+      "2025-10": 8,
+      "2025-11": 39,
+      "2025-12": 114,
+      "2026-01": 252,
+      "2026-02": 1281,
+      "2026-03": 2656,
+      "2026-04": 7781,
+      "2026-05": 3642,
+      "2026-06": 1154
+    },
+    "monthly_selected_six_narratives": {
+      "2016-01": 1,
+      "2017-06": 1,
+      "2017-08": 2,
+      "2017-12": 1,
+      "2018-02": 1,
+      "2018-07": 1,
+      "2018-09": 1,
+      "2018-10": 1,
+      "2019-11": 1,
+      "2020-12": 1,
+      "2021-06": 1,
+      "2023-09": 3,
+      "2023-11": 1,
+      "2023-12": 5,
+      "2024-01": 1,
+      "2024-02": 2,
+      "2024-05": 1,
+      "2024-06": 2,
+      "2024-08": 1,
+      "2024-09": 1,
+      "2024-11": 2,
+      "2024-12": 1,
+      "2025-01": 2,
+      "2025-02": 2,
+      "2025-04": 13,
+      "2025-05": 18,
+      "2025-06": 6,
+      "2025-07": 5,
+      "2025-08": 6,
+      "2025-09": 4,
+      "2025-10": 6,
+      "2025-11": 35,
+      "2025-12": 94,
+      "2026-01": 210,
+      "2026-02": 1117,
+      "2026-03": 2372,
+      "2026-04": 6763,
+      "2026-05": 3209,
+      "2026-06": 1025
+    },
+    "selected_redaction_marker_rows": 11636,
+    "selected_over_20000_chars": 9
+  },
+  "data_dictionary": {
+    "Date received": {
+      "meaning": "Complaint receipt timestamp",
+      "model_role": "time split only"
+    },
+    "Product": {
+      "meaning": "Financial product category",
+      "model_role": "target label"
+    },
+    "Sub-product": {
+      "meaning": "Product subtype",
+      "model_role": "audit only; excluded from features"
+    },
+    "Issue": {
+      "meaning": "Issue category",
+      "model_role": "audit only; excluded from features"
+    },
+    "Sub-issue": {
+      "meaning": "Issue subtype",
+      "model_role": "audit only; excluded from features"
+    },
+    "Consumer complaint narrative": {
+      "meaning": "Consumer narrative",
+      "model_role": "sole model feature"
+    },
+    "Company public response": {
+      "meaning": "Public company response",
+      "model_role": "post-submission; excluded"
+    },
+    "Company": {
+      "meaning": "Named company",
+      "model_role": "audit only; excluded"
+    },
+    "State": {
+      "meaning": "Consumer state",
+      "model_role": "audit only; excluded"
+    },
+    "ZIP code": {
+      "meaning": "Consumer ZIP code",
+      "model_role": "sensitive; excluded"
+    },
+    "Tags": {
+      "meaning": "Complaint tags",
+      "model_role": "audit only; excluded"
+    },
+    "Submitted via": {
+      "meaning": "Submission channel",
+      "model_role": "audit only; excluded"
+    },
+    "Date sent to company": {
+      "meaning": "Forwarding date",
+      "model_role": "post-submission; excluded"
+    },
+    "Company response to consumer": {
+      "meaning": "Response outcome",
+      "model_role": "post-submission; excluded"
+    },
+    "Timely response?": {
+      "meaning": "Response timeliness",
+      "model_role": "post-submission; excluded"
+    },
+    "Complaint ID": {
+      "meaning": "Record identifier",
+      "model_role": "dedup tie-break only; excluded"
+    }
+  },
+  "deduplication": {
+    "normalized_text_groups": 13415,
+    "duplicate_extra_rows": 1504,
+    "conflicting_label_groups_excluded": 1,
+    "conflicting_rows_excluded": 2,
+    "unique_nonconflicting_rows": 13414
+  },
+  "splits": {
+    "train": {
+      "n": 3615,
+      "date_min": "2016-01-11",
+      "date_max": "2026-03-31",
+      "class_counts": {
+        "Debt collection": 1465,
+        "Checking or savings account": 688,
+        "Credit card": 685,
+        "Money transfer, virtual currency, or money service": 305,
+        "Mortgage": 255,
+        "Credit reporting or other personal consumer reports": 217
+      }
+    },
+    "validation": {
+      "n": 6111,
+      "date_min": "2026-04-01",
+      "date_max": "2026-04-30",
+      "class_counts": {
+        "Debt collection": 1895,
+        "Checking or savings account": 1396,
+        "Credit card": 1360,
+        "Money transfer, virtual currency, or money service": 729,
+        "Mortgage": 512,
+        "Credit reporting or other personal consumer reports": 219
+      }
+    },
+    "test": {
+      "n": 2742,
+      "date_min": "2026-05-01",
+      "date_max": "2026-05-31",
+      "class_counts": {
+        "Debt collection": 772,
+        "Checking or savings account": 649,
+        "Credit card": 665,
+        "Money transfer, virtual currency, or money service": 249,
+        "Mortgage": 241,
+        "Credit reporting or other personal consumer reports": 166
+      }
+    }
+  },
+  "outside_window_by_month": {
+    "2026-06": 946
+  },
+  "model": {
+    "name": "bag-of-words multinomial naive Bayes",
+    "train_rows": 3615,
+    "min_document_frequency": 2,
+    "vocabulary_size": 6881,
+    "alpha_candidates": [
+      0.1,
+      1.0,
+      5.0
+    ],
+    "selected_alpha": 1.0,
+    "test_docs_without_train_vocabulary": 0,
+    "test_docs_over_token_cap": 1
+  },
+  "validation_alpha_scores": [
+    {
+      "alpha": 0.1,
+      "accuracy": 0.74357715594829,
+      "macro_f1": 0.7159692348891246
+    },
+    {
+      "alpha": 1.0,
+      "accuracy": 0.7479954180985109,
+      "macro_f1": 0.7169355815929533
+    },
+    {
+      "alpha": 5.0,
+      "accuracy": 0.6962853870070365,
+      "macro_f1": 0.5347197516958193
+    }
+  ],
+  "test": {
+    "majority_label_from_train": "Debt collection",
+    "majority": {
+      "n": 2742,
+      "correct": 772,
+      "accuracy": 0.2815463165572575,
+      "macro_f1": 0.07323088597988996,
+      "coverage": 1.0,
+      "accuracy_when_auto": 0.2815463165572575,
+      "per_class": {
+        "Debt collection": {
+          "support": 772,
+          "precision": 0.2815463165572575,
+          "recall": 1.0,
+          "f1": 0.43938531587933977
+        },
+        "Checking or savings account": {
+          "support": 649,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "Credit card": {
+          "support": 665,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "Money transfer, virtual currency, or money service": {
+          "support": 249,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "Mortgage": {
+          "support": 241,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "Credit reporting or other personal consumer reports": {
+          "support": 166,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "confusion_matrix": {
+        "Debt collection": {
+          "Debt collection": 772,
+          "Checking or savings account": 0,
+          "Credit card": 0,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 0,
+          "Credit reporting or other personal consumer reports": 0,
+          "review": 0
+        },
+        "Checking or savings account": {
+          "Debt collection": 649,
+          "Checking or savings account": 0,
+          "Credit card": 0,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 0,
+          "Credit reporting or other personal consumer reports": 0,
+          "review": 0
+        },
+        "Credit card": {
+          "Debt collection": 665,
+          "Checking or savings account": 0,
+          "Credit card": 0,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 0,
+          "Credit reporting or other personal consumer reports": 0,
+          "review": 0
+        },
+        "Money transfer, virtual currency, or money service": {
+          "Debt collection": 249,
+          "Checking or savings account": 0,
+          "Credit card": 0,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 0,
+          "Credit reporting or other personal consumer reports": 0,
+          "review": 0
+        },
+        "Mortgage": {
+          "Debt collection": 241,
+          "Checking or savings account": 0,
+          "Credit card": 0,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 0,
+          "Credit reporting or other personal consumer reports": 0,
+          "review": 0
+        },
+        "Credit reporting or other personal consumer reports": {
+          "Debt collection": 166,
+          "Checking or savings account": 0,
+          "Credit card": 0,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 0,
+          "Credit reporting or other personal consumer reports": 0,
+          "review": 0
+        }
+      },
+      "accuracy_95_wilson": [
+        0.26502688651219497,
+        0.29867698424422995
+      ],
+      "coverage_95_wilson": [
+        0.998600990305411,
+        0.9999999999999999
+      ],
+      "accuracy_when_auto_95_wilson": [
+        0.26502688651219497,
+        0.29867698424422995
+      ],
+      "macro_f1_95_bootstrap": [
+        0.07008448540706605,
+        0.07666385846672283
+      ]
+    },
+    "rules_from_stage1": {
+      "n": 2742,
+      "correct": 1111,
+      "accuracy": 0.4051787016776076,
+      "macro_f1": 0.4816080392780601,
+      "coverage": 0.5860685630926331,
+      "accuracy_when_auto": 0.6913503422526447,
+      "per_class": {
+        "Debt collection": {
+          "support": 772,
+          "precision": 0.8997613365155132,
+          "recall": 0.4883419689119171,
+          "f1": 0.6330814441645676
+        },
+        "Checking or savings account": {
+          "support": 649,
+          "precision": 0.7195571955719557,
+          "recall": 0.300462249614792,
+          "f1": 0.42391304347826086
+        },
+        "Credit card": {
+          "support": 665,
+          "precision": 0.8754578754578755,
+          "recall": 0.3593984962406015,
+          "f1": 0.509594882729211
+        },
+        "Money transfer, virtual currency, or money service": {
+          "support": 249,
+          "precision": 0.7419354838709677,
+          "recall": 0.09236947791164658,
+          "f1": 0.16428571428571428
+        },
+        "Mortgage": {
+          "support": 241,
+          "precision": 0.9244186046511628,
+          "recall": 0.6597510373443983,
+          "f1": 0.7699757869249395
+        },
+        "Credit reporting or other personal consumer reports": {
+          "support": 166,
+          "precision": 0.2675736961451247,
+          "recall": 0.7108433734939759,
+          "f1": 0.38879736408566723
+        }
+      },
+      "confusion_matrix": {
+        "Debt collection": {
+          "Debt collection": 377,
+          "Checking or savings account": 11,
+          "Credit card": 10,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 3,
+          "Credit reporting or other personal consumer reports": 235,
+          "review": 136
+        },
+        "Checking or savings account": {
+          "Debt collection": 8,
+          "Checking or savings account": 195,
+          "Credit card": 13,
+          "Money transfer, virtual currency, or money service": 6,
+          "Mortgage": 6,
+          "Credit reporting or other personal consumer reports": 7,
+          "review": 414
+        },
+        "Credit card": {
+          "Debt collection": 20,
+          "Checking or savings account": 22,
+          "Credit card": 239,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 3,
+          "Credit reporting or other personal consumer reports": 60,
+          "review": 321
+        },
+        "Money transfer, virtual currency, or money service": {
+          "Debt collection": 4,
+          "Checking or savings account": 41,
+          "Credit card": 9,
+          "Money transfer, virtual currency, or money service": 23,
+          "Mortgage": 1,
+          "Credit reporting or other personal consumer reports": 2,
+          "review": 169
+        },
+        "Mortgage": {
+          "Debt collection": 5,
+          "Checking or savings account": 2,
+          "Credit card": 2,
+          "Money transfer, virtual currency, or money service": 2,
+          "Mortgage": 159,
+          "Credit reporting or other personal consumer reports": 19,
+          "review": 52
+        },
+        "Credit reporting or other personal consumer reports": {
+          "Debt collection": 5,
+          "Checking or savings account": 0,
+          "Credit card": 0,
+          "Money transfer, virtual currency, or money service": 0,
+          "Mortgage": 0,
+          "Credit reporting or other personal consumer reports": 118,
+          "review": 43
+        }
+      },
+      "accuracy_95_wilson": [
+        0.3869485850604183,
+        0.42367413012600985
+      ],
+      "coverage_95_wilson": [
+        0.5675252496951547,
+        0.6043710549817797
+      ],
+      "accuracy_when_auto_95_wilson": [
+        0.6683312435030041,
+        0.7134567944397522
+      ],
+      "macro_f1_95_bootstrap": [
+        0.4625406968852688,
+        0.49990741378434533
+      ]
+    },
+    "naive_bayes": {
+      "n": 2742,
+      "correct": 2034,
+      "accuracy": 0.7417943107221007,
+      "macro_f1": 0.7171524616079957,
+      "coverage": 1.0,
+      "accuracy_when_auto": 0.7417943107221007,
+      "per_class": {
+        "Debt collection": {
+          "support": 772,
+          "precision": 0.889060092449923,
+          "recall": 0.7474093264248705,
+          "f1": 0.8121041520056298
+        },
+        "Checking or savings account": {
+          "support": 649,
+          "precision": 0.6499388004895961,
+          "recall": 0.8181818181818182,
+          "f1": 0.7244201909959073
+        },
+        "Credit card": {
+          "support": 665,
+          "precision": 0.7374810318664643,
+          "recall": 0.7308270676691729,
+          "f1": 0.7341389728096677
+        },
+        "Money transfer, virtual currency, or money service": {
+          "support": 249,
+          "precision": 0.6776315789473685,
+          "recall": 0.41365461847389556,
+          "f1": 0.513715710723192
+        },
+        "Mortgage": {
+          "support": 241,
+          "precision": 0.852,
+          "recall": 0.8838174273858921,
+          "f1": 0.8676171079429735
+        },
+        "Credit reporting or other personal consumer reports": {
+          "support": 166,
+          "precision": 0.5767441860465117,
+          "recall": 0.7469879518072289,
+          "f1": 0.6509186351706037
+        }
+      },
+      "confusion_matrix": {
+        "Debt collection": {
+          "Debt collection": 577,
+          "Checking or savings account": 48,
+          "Credit card": 68,
+          "Money transfer, virtual currency, or money service": 3,
+          "Mortgage": 23,
+          "Credit reporting or other personal consumer reports": 53,
+          "review": 0
+        },
+        "Checking or savings account": {
+          "Debt collection": 7,
+          "Checking or savings account": 531,
+          "Credit card": 67,
+          "Money transfer, virtual currency, or money service": 30,
+          "Mortgage": 4,
+          "Credit reporting or other personal consumer reports": 10,
+          "review": 0
+        },
+        "Credit card": {
+          "Debt collection": 33,
+          "Checking or savings account": 99,
+          "Credit card": 486,
+          "Money transfer, virtual currency, or money service": 14,
+          "Mortgage": 8,
+          "Credit reporting or other personal consumer reports": 25,
+          "review": 0
+        },
+        "Money transfer, virtual currency, or money service": {
+          "Debt collection": 0,
+          "Checking or savings account": 123,
+          "Credit card": 22,
+          "Money transfer, virtual currency, or money service": 103,
+          "Mortgage": 0,
+          "Credit reporting or other personal consumer reports": 1,
+          "review": 0
+        },
+        "Mortgage": {
+          "Debt collection": 4,
+          "Checking or savings account": 12,
+          "Credit card": 9,
+          "Money transfer, virtual currency, or money service": 1,
+          "Mortgage": 213,
+          "Credit reporting or other personal consumer reports": 2,
+          "review": 0
+        },
+        "Credit reporting or other personal consumer reports": {
+          "Debt collection": 28,
+          "Checking or savings account": 4,
+          "Credit card": 7,
+          "Money transfer, virtual currency, or money service": 1,
+          "Mortgage": 2,
+          "Credit reporting or other personal consumer reports": 124,
+          "review": 0
+        }
+      },
+      "accuracy_95_wilson": [
+        0.7250830583989745,
+        0.7578290178756335
+      ],
+      "coverage_95_wilson": [
+        0.998600990305411,
+        0.9999999999999999
+      ],
+      "accuracy_when_auto_95_wilson": [
+        0.7250830583989745,
+        0.7578290178756335
+      ],
+      "macro_f1_95_bootstrap": [
+        0.697419512065423,
+        0.7361573839322858
+      ]
+    }
+  },
+  "checks": {
+    "hash_overlap_across_splits": 0,
+    "vocabulary_fit_rows": 3615,
+    "test_used_for_alpha_selection": false,
+    "raw_narratives_exported": false
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "dependencies": "Python standard library only"
+  },
+  "runtime_seconds": {
+    "hash_and_scan": 9.455,
+    "dedup_fit_validation": 5.011,
+    "total": 23.688
+  },
+  "report": {
+    "source_rows": 1048575,
+    "narrative_rows": 17093,
+    "six_rows": 14919,
+    "dedup_extra_rows": 1504,
+    "conflict_groups": 1,
+    "train_n": 3615,
+    "val_n": 6111,
+    "test_n": 2742,
+    "june_excluded_n": 946,
+    "train_classes": {
+      "Debt collection": 1465,
+      "Checking or savings account": 688,
+      "Credit card": 685,
+      "Money transfer, virtual currency, or money service": 305,
+      "Mortgage": 255,
+      "Credit reporting or other personal consumer reports": 217
+    },
+    "val_classes": {
+      "Debt collection": 1895,
+      "Checking or savings account": 1396,
+      "Credit card": 1360,
+      "Money transfer, virtual currency, or money service": 729,
+      "Mortgage": 512,
+      "Credit reporting or other personal consumer reports": 219
+    },
+    "test_classes": {
+      "Debt collection": 772,
+      "Checking or savings account": 649,
+      "Credit card": 665,
+      "Money transfer, virtual currency, or money service": 249,
+      "Mortgage": 241,
+      "Credit reporting or other personal consumer reports": 166
+    },
+    "class_total": {
+      "Debt collection": 53835,
+      "Checking or savings account": 13191,
+      "Credit card": 13509,
+      "Money transfer, virtual currency, or money service": 5706,
+      "Mortgage": 5139,
+      "Credit reporting or other personal consumer reports": 946029
+    },
+    "class_narratives": {
+      "Debt collection": 5566,
+      "Checking or savings account": 3020,
+      "Credit card": 3009,
+      "Money transfer, virtual currency, or money service": 1328,
+      "Mortgage": 1082,
+      "Credit reporting or other personal consumer reports": 914
+    },
+    "month_raw_narratives": {
+      "2026-03": 2372,
+      "2026-04": 6763,
+      "2026-05": 3209,
+      "2026-06": 1025
+    },
+    "field_missing": {
+      "Date received": 0,
+      "Product": 121,
+      "Sub-product": 139,
+      "Issue": 145,
+      "Sub-issue": 12173,
+      "Consumer complaint narrative": 1031482,
+      "Company public response": 642432,
+      "Company": 0,
+      "State": 1314,
+      "ZIP code": 913,
+      "Tags": 1026565,
+      "Submitted via": 0,
+      "Date sent to company": 39019,
+      "Company response to consumer": 222634,
+      "Timely response?": 0,
+      "Complaint ID": 2390
+    },
+    "chosen_alpha": 1.0,
+    "models": {
+      "majority": {
+        "accuracy": 0.2815463165572575,
+        "macro_f1": 0.07323088597988996,
+        "coverage": 1.0,
+        "accuracy_when_auto": 0.2815463165572575,
+        "per_class_recall": {
+          "Debt collection": 1.0,
+          "Checking or savings account": 0.0,
+          "Credit card": 0.0,
+          "Money transfer, virtual currency, or money service": 0.0,
+          "Mortgage": 0.0,
+          "Credit reporting or other personal consumer reports": 0.0
+        },
+        "accuracy_ci_95": [
+          0.26502688651219497,
+          0.29867698424422995
+        ],
+        "macro_f1_ci_95": [
+          0.07008448540706605,
+          0.07666385846672283
+        ]
+      },
+      "rules_from_stage1": {
+        "accuracy": 0.4051787016776076,
+        "macro_f1": 0.4816080392780601,
+        "coverage": 0.5860685630926331,
+        "accuracy_when_auto": 0.6913503422526447,
+        "per_class_recall": {
+          "Debt collection": 0.4883419689119171,
+          "Checking or savings account": 0.300462249614792,
+          "Credit card": 0.3593984962406015,
+          "Money transfer, virtual currency, or money service": 0.09236947791164658,
+          "Mortgage": 0.6597510373443983,
+          "Credit reporting or other personal consumer reports": 0.7108433734939759
+        },
+        "accuracy_ci_95": [
+          0.3869485850604183,
+          0.42367413012600985
+        ],
+        "macro_f1_ci_95": [
+          0.4625406968852688,
+          0.49990741378434533
+        ]
+      },
+      "naive_bayes": {
+        "accuracy": 0.7417943107221007,
+        "macro_f1": 0.7171524616079957,
+        "coverage": 1.0,
+        "accuracy_when_auto": 0.7417943107221007,
+        "per_class_recall": {
+          "Debt collection": 0.7474093264248705,
+          "Checking or savings account": 0.8181818181818182,
+          "Credit card": 0.7308270676691729,
+          "Money transfer, virtual currency, or money service": 0.41365461847389556,
+          "Mortgage": 0.8838174273858921,
+          "Credit reporting or other personal consumer reports": 0.7469879518072289
+        },
+        "accuracy_ci_95": [
+          0.7250830583989745,
+          0.7578290178756335
+        ],
+        "macro_f1_ci_95": [
+          0.697419512065423,
+          0.7361573839322858
+        ]
+      }
+    }
+  }
+}

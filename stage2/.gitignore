@@ -1,0 +1,6 @@
+__pycache__/
+tmp/
+*.pyc
+complaints.csv
+complaints.csv.zip
+complaints.xlsx
