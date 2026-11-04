@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results" / "summary.json"
 OUT = ROOT / "YangZhao_phase2_report.pdf"
 REPO = "https://github.com/cwiapp/financial-complaint-routing"
-TAG = "phase-2-submission"
+TAG = "phase-2-submission-v2"
 
 pdfmetrics.registerFont(TTFont("MSYH", r"C:\Windows\Fonts\msyh.ttc", subfontIndex=0))
 pdfmetrics.registerFont(TTFont("MSYH-Bold", r"C:\Windows\Fonts\msyhbd.ttc", subfontIndex=0))
@@ -339,15 +339,15 @@ def build():
                      ["误分流", "五月转账类召回率仅 41.4%", "保留转人工与人工改派路径"],
                      ["潜在隐私", "11,663 条六类叙述含脱敏占位符", "公开仓库只放聚合与合成数据"]],
                     [37 * mm, 66 * mm, 67 * mm]),
-              sub("6.2 阶段三至五的可验收计划（责任人为建议分工）"),
+              sub("6.2 阶段三至五的可验收计划"),
               table([["阶段／拟负责人", "依赖与交付完成标准"],
-                     ["阶段三<br/>杨俊炜：模型<br/>赵煜凡：评估", "以阶段二冻结切分为依赖；比较 NB、TF-IDF 线性模型与规则，给出同集宏 F1、各类召回、错误类型和运行成本。"],
-                     ["阶段四<br/>杨俊炜：集成<br/>赵煜凡：测试", "在选定模型上实现本地 CLI：输入文本、类别或转人工输出；端到端测试覆盖空值、过长文本和异常路径。"],
-                     ["阶段五<br/>赵煜凡：审计<br/>杨俊炜：修复", "以阶段四系统为对象，验证集选拒答阈值；完成扰动、类别与时间漂移审计，形成回滚规则和整合报告。"]],
+                     ["阶段三<br/>杨俊炜：建模评估<br/>赵煜凡：数据采集", "以阶段二冻结切分为依赖；比较 NB、TF-IDF 线性模型与规则，给出同集宏 F1、各类召回、错误类型和运行成本。"],
+                     ["阶段四<br/>杨俊炜：集成测试<br/>赵煜凡：数据采集", "在选定模型上实现本地 CLI：输入文本、类别或转人工输出；端到端测试覆盖空值、过长文本和异常路径。"],
+                     ["阶段五<br/>杨俊炜：审计修复<br/>赵煜凡：数据采集", "以阶段四系统为对象，验证集选拒答阈值；完成扰动、类别与时间漂移审计，形成回滚规则和整合报告。"]],
                     [45 * mm, 125 * mm]),
-              p("以上是后续任务建议，须经两位成员确认。每阶段保存输入哈希、运行环境、测试日志和独立 Git 标签；发布后的标签不移动。", SMALL),
+              p("每阶段保存输入哈希、运行环境、测试日志和独立 Git 标签；发布后的标签不移动。", SMALL),
               sub("6.3 贡献与 AI 使用声明"),
-              p("成员为杨俊炜、赵煜凡。两人的实际个人工作尚未由本人确认，正式课程提交前须据实补充贡献声明。阶段二代码、数据分析和报告草稿由 OpenAI Codex 协助生成；团队须理解、复核和披露辅助范围，不能将未核实内容声称为独立完成。", SMALL),
+              p("团队提供的分工：赵煜凡负责数据采集与提供本地历史快照；杨俊炜负责其余阶段二工作，包括问题修订、数据处理与分析、实验设计、基线实现、测试、图表、报告和仓库整理。阶段二代码、数据分析和报告草稿由 OpenAI Codex 协助生成；两位成员须理解、复核并按课程政策披露辅助范围。", SMALL),
               sub("参考资料"),
               p("[1] CFPB, Consumer Complaint Database, 2026. <link href='https://www.consumerfinance.gov/data-research/consumer-complaints/' color='#245C99'>consumerfinance.gov/data-research/consumer-complaints/</link>。", TINY),
               p("[2] CFPB, How we share complaint data, 2026. <link href='https://www.consumerfinance.gov/complaint/data-use/' color='#245C99'>consumerfinance.gov/complaint/data-use/</link>。", TINY),

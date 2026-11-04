@@ -2,6 +2,8 @@
 
 本目录保存阶段二报告所用的流式数据审计、去重、时间划分、基线比较和合成数据测试。推理特征仅为英文投诉叙述。脚本只写汇总统计，不输出或提交任何真实投诉原文。阶段一的规则被保留为可比较基线；新增的词袋多项式朴素贝叶斯模型由训练集实际拟合。
 
+阶段二修订提交标签为 `phase-2-submission-v2`；原始 `phase-2-submission` 标签保留不变。团队分工见 [CONTRIBUTIONS.md](CONTRIBUTIONS.md)。
+
 ## 数据与环境
 
 - Python 3.11 或更新版本。`stage2.py`、`make_charts.py` 与测试仅使用标准库；重新生成 PDF 报告需安装 `reportlab`（见 `requirements.txt`），当前排版脚本还使用 Windows 的微软雅黑字体路径。

@@ -27,9 +27,9 @@ python -m unittest -v
 ## 目录与提交前待补
 
 - `YangZhao_phase1_report.pdf`：阶段一已发布版本的报告副本；阶段一标签仍保留原提交。
-- `stage2/YangZhao_phase2_report.pdf`：阶段二报告；对应 `phase-2-submission` 标签。
+- `stage2/YangZhao_phase2_report.pdf`：阶段二报告；修订版对应 `phase-2-submission-v2` 标签。
 - `prototype.py`：数据流式读取、数据审计、规则分流和评价。
 - `test_prototype.py`：15 个边界及正确性测试。
 - `requirements.txt`：运行依赖说明。
 
-成员为杨俊炜、赵煜凡。Git 仓库为 <https://github.com/cwiapp/financial-complaint-routing>，阶段一与阶段二提交标签分别为 `phase-1-submission`、`phase-2-submission`。团队名称与成员具体分工尚未提供，正式提交前需据实补充。
+成员为杨俊炜、赵煜凡。Git 仓库为 <https://github.com/cwiapp/financial-complaint-routing>。阶段一标签为 `phase-1-submission`；阶段二原始标签为 `phase-2-submission`，填入团队分工后的修订标签为 `phase-2-submission-v2`。阶段二贡献声明见 [`stage2/CONTRIBUTIONS.md`](stage2/CONTRIBUTIONS.md)。
