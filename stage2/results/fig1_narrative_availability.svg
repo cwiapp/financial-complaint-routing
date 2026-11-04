@@ -1,30 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 470" role="img" aria-label="Narrative availability differs sharply by product">
 <rect width="100%" height="100%" fill="white"/>
-<text x="38" y="43" font-family="Arial" font-size="22" font-weight="bold" fill="#14263D">Narrative availability differs sharply by product</text>
-<text x="39" y="68" font-family="Arial" font-size="13" fill="#526071">Share of records with nonempty consumer narratives; first workbook-sized source segment</text>
-<text x="39" y="123" font-family="Arial" font-size="14" fill="#14263D">Debt collection</text>
+<text x="38" y="43" font-family="Arial" font-size="22" font-weight="bold" fill="#000000">Narrative availability differs sharply by product</text>
+<text x="39" y="68" font-family="Arial" font-size="13" fill="#000000">Share of records with nonempty consumer narratives; first workbook-sized source segment</text>
+<text x="39" y="123" font-family="Arial" font-size="14" fill="#000000">Debt collection</text>
 <rect x="285" y="104" width="550" height="24" rx="4" fill="#E7EEF4"/>
 <rect x="285" y="104" width="226" height="24" rx="4" fill="#2475B8"/>
-<text x="855" y="122" font-family="Arial" font-size="14" font-weight="bold" fill="#14263D">10.3%</text>
-<text x="39" y="174" font-family="Arial" font-size="14" fill="#14263D">Checking/savings</text>
+<text x="855" y="122" font-family="Arial" font-size="14" font-weight="bold" fill="#000000">10.3%</text>
+<text x="39" y="174" font-family="Arial" font-size="14" fill="#000000">Checking/savings</text>
 <rect x="285" y="155" width="550" height="24" rx="4" fill="#E7EEF4"/>
 <rect x="285" y="155" width="501" height="24" rx="4" fill="#12A393"/>
-<text x="855" y="173" font-family="Arial" font-size="14" font-weight="bold" fill="#14263D">22.9%</text>
-<text x="39" y="225" font-family="Arial" font-size="14" fill="#14263D">Credit card</text>
+<text x="855" y="173" font-family="Arial" font-size="14" font-weight="bold" fill="#000000">22.9%</text>
+<text x="39" y="225" font-family="Arial" font-size="14" fill="#000000">Credit card</text>
 <rect x="285" y="206" width="550" height="24" rx="4" fill="#E7EEF4"/>
 <rect x="285" y="206" width="487" height="24" rx="4" fill="#E6A43C"/>
-<text x="855" y="224" font-family="Arial" font-size="14" font-weight="bold" fill="#14263D">22.3%</text>
-<text x="39" y="276" font-family="Arial" font-size="14" fill="#14263D">Money transfer</text>
+<text x="855" y="224" font-family="Arial" font-size="14" font-weight="bold" fill="#000000">22.3%</text>
+<text x="39" y="276" font-family="Arial" font-size="14" fill="#000000">Money transfer</text>
 <rect x="285" y="257" width="550" height="24" rx="4" fill="#E7EEF4"/>
 <rect x="285" y="257" width="509" height="24" rx="4" fill="#8360C3"/>
-<text x="855" y="275" font-family="Arial" font-size="14" font-weight="bold" fill="#14263D">23.3%</text>
-<text x="39" y="327" font-family="Arial" font-size="14" fill="#14263D">Mortgage</text>
+<text x="855" y="275" font-family="Arial" font-size="14" font-weight="bold" fill="#000000">23.3%</text>
+<text x="39" y="327" font-family="Arial" font-size="14" fill="#000000">Mortgage</text>
 <rect x="285" y="308" width="550" height="24" rx="4" fill="#E7EEF4"/>
 <rect x="285" y="308" width="461" height="24" rx="4" fill="#D26A61"/>
-<text x="855" y="326" font-family="Arial" font-size="14" font-weight="bold" fill="#14263D">21.1%</text>
-<text x="39" y="378" font-family="Arial" font-size="14" fill="#14263D">Credit reporting</text>
+<text x="855" y="326" font-family="Arial" font-size="14" font-weight="bold" fill="#000000">21.1%</text>
+<text x="39" y="378" font-family="Arial" font-size="14" fill="#000000">Credit reporting</text>
 <rect x="285" y="359" width="550" height="24" rx="4" fill="#E7EEF4"/>
 <rect x="285" y="359" width="2" height="24" rx="4" fill="#6E879E"/>
-<text x="855" y="377" font-family="Arial" font-size="14" font-weight="bold" fill="#14263D">0.097%</text>
-<text x="39" y="445" font-family="Arial" font-size="12" fill="#526071">A narrative-only model observes a selective subset; this is not a population prevalence estimate.</text>
+<text x="855" y="377" font-family="Arial" font-size="14" font-weight="bold" fill="#000000">0.097%</text>
+<text x="39" y="445" font-family="Arial" font-size="12" fill="#000000">A narrative-only model observes a selective subset; this is not a population prevalence estimate.</text>
 </svg>

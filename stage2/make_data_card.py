@@ -17,7 +17,7 @@ def build_card(data: dict) -> str:
         "",
         "## 来源、版本与适用范围",
         "",
-        "本项目使用用户提供的 `complaints.csv.zip` 历史快照。字段结构与 [CFPB Consumer Complaint Database](https://www.consumerfinance.gov/data-research/consumer-complaints/) 相似；原始下载日期、再分发许可和工作簿/压缩 CSV 的逐行一致性尚未独立核实。当前官网下载文件未必等同于本快照。公共仓库不包含源数据或任何真实投诉原文。",
+        "团队声明由赵煜凡负责数据采集，向小组提供 `complaints.csv.zip` 与 `complaints.xlsx` 本地历史快照。研究脚本顺序读取 ZIP 中的前段记录，核对两份文件的表头及前两行并计算 ZIP 哈希；未逐行核对整个工作簿。字段结构与 [CFPB Consumer Complaint Database](https://www.consumerfinance.gov/data-research/consumer-complaints/) 相似。CFPB 当前页面说明其发布的数据可自由使用与分析，但本地快照的原始下载日期、筛选条件及当时许可凭证未随文件提供，故无法独立核实其完整来源链；当前官网下载文件也未必等同于该快照。公共仓库不包含源数据或真实投诉原文。",
         "",
         f"- ZIP SHA-256：`{source['sha256']}`。",
         f"- 读取前 {source['rows_read']:,} 条 CSV 数据行，对应给定工作簿可容纳的数据行数；不代表 ZIP 的全部记录。",
