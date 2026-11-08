@@ -38,9 +38,9 @@ python stage2/make_data_card.py --summary stage2/results/summary.json
 ## 目录与提交版本
 
 - `YangZhao_phase1_report.pdf`：阶段一已发布版本的报告副本；阶段一标签仍保留原提交。
-- `stage2/YangZhao_phase2_report.pdf`：按阶段二六项评分标准修订的报告；对应 `phase-2-submission-v4` 标签。旧版可从先前的阶段二标签读取。
+- `stage2/YangZhao_phase2_report.pdf`：阶段二正式报告，正文 6 页，另有 1 页参考文献与附录；对应 `phase-2-submission` 标签。本次格式修订沿用已记录的实验结果。
 - `prototype.py`：数据流式读取、数据审计、规则分流和评价。
 - `test_prototype.py`：15 个边界及正确性测试。
 - `requirements.txt`：运行依赖说明。
 
-成员为杨俊炜、赵煜凡。Git 仓库为 <https://github.com/cwiapp/financial-complaint-routing>。阶段一标签为 `phase-1-submission`；阶段二保留此前标签 `phase-2-submission`、`phase-2-submission-v2` 和 `phase-2-submission-v3`，本次修订为 `phase-2-submission-v4`。阶段二明确分工见 [`stage2/CONTRIBUTIONS.md`](stage2/CONTRIBUTIONS.md)。
+成员为杨俊炜、赵煜凡。Git 仓库为 <https://github.com/cwiapp/financial-complaint-routing>。阶段一标签为 `phase-1-submission`；阶段二正式提交标签为 `phase-2-submission`。初始阶段二版本保留在 `phase-2-submission-v1`，后续历史版本保留在 `phase-2-submission-v2` 至 `phase-2-submission-v4`。阶段二明确分工见 [`stage2/CONTRIBUTIONS.md`](stage2/CONTRIBUTIONS.md)。

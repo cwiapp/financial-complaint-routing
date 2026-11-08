@@ -2,7 +2,7 @@
 
 本目录保存阶段二报告所用的流式数据审计、去重、时间划分、基线比较和合成数据测试。推理特征仅为英文投诉叙述。脚本只写汇总统计，不输出或提交任何真实投诉原文。阶段一的规则被保留为可比较基线；新增的词袋多项式朴素贝叶斯模型由训练集实际拟合。
 
-按六项评分标准修订的报告为 `YangZhao_phase2_report.pdf`，本次提交标签为 `phase-2-submission-v4`；此前的 `phase-2-submission`、`phase-2-submission-v2` 和 `phase-2-submission-v3` 标签保留。团队分工见 [CONTRIBUTIONS.md](CONTRIBUTIONS.md)。报告与两张结果图中的所有文字均为黑色。
+正式报告为 `YangZhao_phase2_report.pdf`，正文 6 页，另有 1 页参考文献与附录；提交标签为 `phase-2-submission`。初始阶段二版本保留在 `phase-2-submission-v1`，后续历史版本保留在 `phase-2-submission-v2` 至 `phase-2-submission-v4`。本次格式修订沿用已记录的实验结果。团队分工见 [CONTRIBUTIONS.md](CONTRIBUTIONS.md)。报告与两张结果图中的所有文字均为黑色。
 
 ## 数据与环境
 
