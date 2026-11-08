@@ -51,10 +51,10 @@ def split_shift(data: dict) -> str:
     splits = data["report"]
     groups = [("Train through Mar", splits["train_classes"], splits["train_n"]),
               ("Apr validation", splits["val_classes"], splits["val_n"]),
-              ("May test", splits["test_classes"], splits["test_n"])]
+              ("May retrospective", splits["test_classes"], splits["test_n"])]
     lines = svg_start(980, 530, "Class mix and volume change across time splits")
     lines.append('<text x="39" y="68" font-family="Arial" font-size="13" fill="#000000">'
-                 'After normalized-text group deduplication and label-conflict exclusion</text>')
+                 'First receipt day fixes label; later disagreements cannot delete earlier records</text>')
     left = 325
     for i, (name, counts, n) in enumerate(groups):
         y = 108 + i * 83
@@ -75,7 +75,7 @@ def split_shift(data: dict) -> str:
         lines.append(f'<text x="{x+25}" y="{y}" font-family="Arial" font-size="13" '
                      f'fill="#000000">{escape(label)}</text>')
     lines.append('<text x="39" y="493" font-family="Arial" font-size="12" fill="#000000">'
-                 'April contains 6,111 eligible narratives versus 3,615 in all training months; temporal validation is essential.</text>')
+                 f'April contains {splits["val_n"]:,} eligible narratives versus {splits["train_n"]:,} in training; May was inspected earlier.</text>')
     lines.append('</svg>')
     return "\n".join(lines) + "\n"
 

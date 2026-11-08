@@ -12,6 +12,9 @@ from stage2 import HERE, PRODUCTS
 def build_card(data: dict) -> str:
     source = data["source"]
     report = data["report"]
+    dedup = data["deduplication"]
+    length = source["selected_narrative_length_chars"]
+    paired = report["paired_delta_nb_minus_rules"]
     rows = [
         "# 数据卡：金融投诉历史快照（阶段二）",
         "",
@@ -23,6 +26,7 @@ def build_card(data: dict) -> str:
         f"- 读取前 {source['rows_read']:,} 条 CSV 数据行，对应给定工作簿可容纳的数据行数；不代表 ZIP 的全部记录。",
         f"- 接收日期范围：{source['received_min']} 至 {source['received_max']}。",
         f"- 非空投诉叙述：{source['nonempty_narratives']:,} 条（{source['narrative_rate']:.2%}）；六个目标产品中的非空叙述：{source['selected_six_narratives']:,} 条。",
+        "- 观察单位：一条投诉记录；同一规范化叙述重复出现时，以首次接收日的记录作为建模观察。目标总体仅限有公开英文叙述的六类历史投诉。",
         "",
         "## 字段字典与缺失情况",
         "",
@@ -48,9 +52,29 @@ def build_card(data: dict) -> str:
         rows.append(f"| {product} | {total:,} | {narrative:,} | {narrative/total:.3%} |")
     rows.extend([
         "",
+        "## 数据质量与时间分布",
+        "",
+        f"六类非空叙述按大小写与空白规范化后的字符长度中位数为 {length['median']:,}，95 分位为 {length['p95']:,}，99 分位为 {length['p99']:,}，最长为 {length['max']:,}；{length['bins']['>=5000']:,} 条达到 5,000 字符。长度统计先于模型的 5,000 个英文词元截断。{source['selected_redaction_marker_rows']:,} 条含脱敏占位符，遮盖并不保证无个人信息。",
+        "",
+        "| 产品类别 | 训练 ≤3 月 | 4 月验证 | 5 月历史复评 |",
+        "|---|---:|---:|---:|",
+    ])
+    for product in PRODUCTS:
+        train = report["train_classes"][product]
+        val = report["val_classes"][product]
+        test = report["test_classes"][product]
+        rows.append(f"| {product} | {train:,} ({train/report['train_n']:.1%}) | {val:,} ({val/report['val_n']:.1%}) | {test:,} ({test/report['test_n']:.1%}) |")
+    rows.extend([
+        "",
+        f"债务催收占比从训练集约 {report['train_classes'][PRODUCTS[0]]/report['train_n']:.1%} 降到五月约 {report['test_classes'][PRODUCTS[0]]/report['test_n']:.1%}，信用卡从约 {report['train_classes'][PRODUCTS[2]]/report['train_n']:.1%} 升到 {report['test_classes'][PRODUCTS[2]]/report['test_n']:.1%}；这支持按时间评估并同时报告宏平均 F1 与各类召回率。四月样本量高于训练期，具体成因不能仅凭本快照确定。",
+        "",
         "## 清洗、划分和限制",
         "",
-        f"六类非空叙述中有 {report['dedup_extra_rows']:,} 条重复额外记录；{report['conflict_groups']} 个跨产品标签冲突的文本组被整组剔除。规范化文本先全局分组，再保留最早记录并按接收日期划分，以避免相同叙述跨集合。训练、验证、测试分别为 {report['train_n']:,}、{report['val_n']:,}、{report['test_n']:,} 条；阶段一曾查看的 2026 年 6 月 {report['june_excluded_n']:,} 条去重后记录被排除。",
+        f"六类非空叙述中有 {dedup['duplicate_extra_rows']:,} 条重复额外记录。先把规范化文本全局分组，最早接收日固定标签；最早日若有不同产品标签，则整组排除。本快照最早日冲突为 {dedup['earliest_day_conflicting_groups_excluded']} 组、{dedup['earliest_day_conflicting_rows_excluded']} 条。较晚日期才出现异标签的为 {dedup['later_label_disagreement_groups_kept_first']} 组、{dedup['later_label_disagreement_rows_dropped']} 条：较早的记录保留，较晚记录丢弃，不让未来标签改变历史观察。每组最多保留一条最早日记录，再按接收日期划分；跨集合规范化文本哈希交集为 {data['checks']['hash_overlap_across_splits']}。",
+        "",
+        f"训练、验证、五月历史复评分别为 {report['train_n']:,}、{report['val_n']:,}、{report['test_n']:,} 条；阶段一曾查看的 2026 年 6 月 {report['june_excluded_n']:,} 条去重后记录被排除。五月标签和结果在此前阶段二版本中已被查看，本版属于回顾性复评，不能称五月为未查看过的独立测试；本次平滑参数仍只依四月验证集确定。",
+        "",
+        f"同一批五月行上的朴素贝叶斯与规则基线宏平均 F1 差值为 {paired['delta_macro_f1']:.3f}；{paired['draws']} 次配对自助重采样所得 95% 分位数区间为 [{paired['ci_95_percentile'][0]:.3f}, {paired['ci_95_percentile'][1]:.3f}]。区间反映固定历史样本的抽样波动，不包括时间漂移、文本近重复或重复查看五月结果的影响。",
         "",
         "叙述是否公开并非随机。征信类的叙述可得率远低于其他目标类别，模型测试集因而不能代表全部投诉，也不能推断总体产品分布。文本可能包含个人信息或经过遮盖；仅在内存中用于受限的研究实验，输出和公共仓库只保留汇总统计。`Product` 标签也可能有噪声，未经过独立人工复核。",
         "",

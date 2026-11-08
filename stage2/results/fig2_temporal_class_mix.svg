@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 530" role="img" aria-label="Class mix and volume change across time splits">
 <rect width="100%" height="100%" fill="white"/>
 <text x="38" y="43" font-family="Arial" font-size="22" font-weight="bold" fill="#000000">Class mix and volume change across time splits</text>
-<text x="39" y="68" font-family="Arial" font-size="13" fill="#000000">After normalized-text group deduplication and label-conflict exclusion</text>
+<text x="39" y="68" font-family="Arial" font-size="13" fill="#000000">First receipt day fixes label; later disagreements cannot delete earlier records</text>
 <text x="39" y="125" font-family="Arial" font-size="14" fill="#000000">Train through Mar (n=3,615)</text>
 <rect x="325.00" y="108" width="224.92" height="30" fill="#2475B8"/>
 <rect x="549.92" y="108" width="105.63" height="30" fill="#12A393"/>
@@ -9,14 +9,14 @@
 <rect x="760.71" y="108" width="46.83" height="30" fill="#8360C3"/>
 <rect x="807.54" y="108" width="39.15" height="30" fill="#D26A61"/>
 <rect x="846.68" y="108" width="33.32" height="30" fill="#6E879E"/>
-<text x="39" y="208" font-family="Arial" font-size="14" fill="#000000">Apr validation (n=6,111)</text>
-<rect x="325.00" y="191" width="172.10" height="30" fill="#2475B8"/>
-<rect x="497.10" y="191" width="126.78" height="30" fill="#12A393"/>
-<rect x="623.89" y="191" width="123.51" height="30" fill="#E6A43C"/>
-<rect x="747.40" y="191" width="66.21" height="30" fill="#8360C3"/>
-<rect x="813.61" y="191" width="46.50" height="30" fill="#D26A61"/>
-<rect x="860.11" y="191" width="19.89" height="30" fill="#6E879E"/>
-<text x="39" y="291" font-family="Arial" font-size="14" fill="#000000">May test (n=2,742)</text>
+<text x="39" y="208" font-family="Arial" font-size="14" fill="#000000">Apr validation (n=6,112)</text>
+<rect x="325.00" y="191" width="172.08" height="30" fill="#2475B8"/>
+<rect x="497.08" y="191" width="126.76" height="30" fill="#12A393"/>
+<rect x="623.84" y="191" width="123.49" height="30" fill="#E6A43C"/>
+<rect x="747.33" y="191" width="66.20" height="30" fill="#8360C3"/>
+<rect x="813.53" y="191" width="46.49" height="30" fill="#D26A61"/>
+<rect x="860.02" y="191" width="19.98" height="30" fill="#6E879E"/>
+<text x="39" y="291" font-family="Arial" font-size="14" fill="#000000">May retrospective (n=2,742)</text>
 <rect x="325.00" y="274" width="156.26" height="30" fill="#2475B8"/>
 <rect x="481.26" y="274" width="131.36" height="30" fill="#12A393"/>
 <rect x="612.62" y="274" width="134.60" height="30" fill="#E6A43C"/>
@@ -35,5 +35,5 @@
 <text x="374" y="427" font-family="Arial" font-size="13" fill="#000000">Mortgage</text>
 <rect x="659" y="414" width="17" height="17" fill="#6E879E"/>
 <text x="684" y="427" font-family="Arial" font-size="13" fill="#000000">Credit reporting</text>
-<text x="39" y="493" font-family="Arial" font-size="12" fill="#000000">April contains 6,111 eligible narratives versus 3,615 in all training months; temporal validation is essential.</text>
+<text x="39" y="493" font-family="Arial" font-size="12" fill="#000000">April contains 6,112 eligible narratives versus 3,615 in training; May was inspected earlier.</text>
 </svg>

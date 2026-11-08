@@ -25,7 +25,7 @@ from pathlib import Path
 
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_DATA = HERE.parent / "complaints.csv.zip"
+DEFAULT_DATA = HERE.parent.parent / "complaints.csv.zip"
 DEFAULT_OUTPUT = HERE / "results" / "summary.json"
 EXPECTED_SHA256 = "850d5d220285abecb4d4b94ae4c92a8f318476ce14bd0460c3d6361c79ae9694"
 MAX_ROWS = 1_048_575
@@ -117,6 +117,7 @@ def scan_source(zip_path: Path, max_rows: int = MAX_ROWS) -> tuple[dict, list[di
     monthly_six_narrative = Counter()
     rows_read = narrative_count = selected_count = invalid_dates = 0
     selected_invalid_dates = redaction_markers = long_narratives = 0
+    selected_lengths: list[int] = []
     earliest: date | None = None
     latest: date | None = None
     candidates: list[dict] = []
@@ -149,6 +150,7 @@ def scan_source(zip_path: Path, max_rows: int = MAX_ROWS) -> tuple[dict, list[di
             continue
         monthly_six_narrative[received.strftime("%Y-%m")] += 1
         cleaned = normalize(narrative)
+        selected_lengths.append(len(cleaned))
         redaction_markers += bool(re.search(r"\bx{4,}\b", cleaned))
         long_narratives += len(cleaned) > 20_000
         candidates.append({
@@ -160,6 +162,14 @@ def scan_source(zip_path: Path, max_rows: int = MAX_ROWS) -> tuple[dict, list[di
         })
     if not rows_read:
         raise ValueError("source contains no rows")
+    selected_lengths.sort()
+    def quantile(q: float) -> int | None:
+        return selected_lengths[round(q * (len(selected_lengths) - 1))] if selected_lengths else None
+    length_edges = (200, 500, 1000, 2000, 5000)
+    length_labels = ("<200", "200-499", "500-999", "1000-1999", "2000-4999", ">=5000")
+    length_bins = Counter(length_labels[next((i for i, edge in enumerate(length_edges)
+                                              if length < edge), len(length_edges))]
+                          for length in selected_lengths)
     audit = {
         "rows_read": rows_read,
         "columns": columns,
@@ -178,30 +188,56 @@ def scan_source(zip_path: Path, max_rows: int = MAX_ROWS) -> tuple[dict, list[di
         "monthly_selected_six_narratives": dict(sorted(monthly_six_narrative.items())),
         "selected_redaction_marker_rows": redaction_markers,
         "selected_over_20000_chars": long_narratives,
+        "selected_narrative_length_chars": {
+            "basis": "casefolded, whitespace-normalized narrative",
+            "n": len(selected_lengths), "median": quantile(.5), "p95": quantile(.95),
+            "p99": quantile(.99), "max": selected_lengths[-1] if selected_lengths else None,
+            "bins": {label: length_bins[label] for label in length_labels},
+        },
     }
     return audit, candidates
 
 
 def deduplicate(candidates: list[dict]) -> tuple[list[dict], dict]:
+    """Keep the first observed label without consulting labels from later dates.
+
+    A cross-label conflict on the first day makes that text ambiguous at first
+    observation, so the whole group is excluded. Later disagreements are only
+    counted for audit; they never delete an earlier training observation.
+    """
     groups: dict[str, list[dict]] = defaultdict(list)
     for row in candidates:
         groups[row["hash"]].append(row)
     kept = []
-    duplicate_extra = conflicting_groups = conflicting_rows = 0
+    duplicate_extra = earliest_conflict_groups = earliest_conflict_rows = 0
+    later_conflict_groups = later_conflict_rows = 0
     for group in groups.values():
         duplicate_extra += len(group) - 1
-        if len({r["label"] for r in group}) > 1:
-            conflicting_groups += 1
-            conflicting_rows += len(group)
+        first_day = min(r["date"] for r in group)
+        first_rows = [r for r in group if r["date"] == first_day]
+        if len({r["label"] for r in first_rows}) > 1:
+            earliest_conflict_groups += 1
+            earliest_conflict_rows += len(group)
             continue
-        kept.append(min(group, key=lambda r: (r["date"], r["id"])))
+        first = min(first_rows, key=lambda r: r["id"])
+        disagreements = sum(r["date"] > first_day and r["label"] != first["label"]
+                            for r in group)
+        if disagreements:
+            later_conflict_groups += 1
+            later_conflict_rows += disagreements
+        kept.append(first)
     kept.sort(key=lambda r: (r["date"], r["id"], r["hash"]))
     return kept, {
         "normalized_text_groups": len(groups),
         "duplicate_extra_rows": duplicate_extra,
-        "conflicting_label_groups_excluded": conflicting_groups,
-        "conflicting_rows_excluded": conflicting_rows,
-        "unique_nonconflicting_rows": len(kept),
+        "conflicting_label_groups_excluded": earliest_conflict_groups,
+        "conflicting_rows_excluded": earliest_conflict_rows,
+        "earliest_day_conflicting_groups_excluded": earliest_conflict_groups,
+        "earliest_day_conflicting_rows_excluded": earliest_conflict_rows,
+        "later_label_disagreement_groups_kept_first": later_conflict_groups,
+        "later_label_disagreement_rows_dropped": later_conflict_rows,
+        "first_observation_policy": "first receipt day fixes the label; same-day cross-label ambiguity excludes group; later labels cannot remove earlier group",
+        "unique_first_observation_rows": len(kept),
     }
 
 
@@ -291,9 +327,13 @@ class CountNaiveBayes:
         return [self.predict_one(row["text"], alpha) for row in rows]
 
 
-def rule_predict(text: str) -> str | None:
-    if not text or len(text) < 20 or len(text) > 20_000:
-        return None
+def rule_route(text: str) -> tuple[str | None, str]:
+    if not text:
+        return None, "empty_text"
+    if len(text) < 20:
+        return None, "too_short"
+    if len(text) > 20_000:
+        return None, "too_long"
     hits = {}
     for product, phrases in RULES.items():
         found = [phrase for phrase in phrases
@@ -301,10 +341,14 @@ def rule_predict(text: str) -> str | None:
         if found:
             hits[product] = sum(2 if " " in phrase else 1 for phrase in found)
     if not hits:
-        return None
+        return None, "no_rule_match"
     best = max(hits.values())
     winners = [p for p, score in hits.items() if score == best]
-    return winners[0] if len(winners) == 1 else None
+    return (winners[0], "rule_match") if len(winners) == 1 else (None, "ambiguous")
+
+
+def rule_predict(text: str) -> str | None:
+    return rule_route(text)[0]
 
 
 def wilson(successes: int, total: int) -> list[float] | None:
@@ -340,6 +384,32 @@ def bootstrap_macro_f1(true: list[str], pred: list[str | None],
         scores.append(macro_f1([true[i] for i in indexes], [pred[i] for i in indexes]))
     scores.sort()
     return [scores[int(.025 * (draws - 1))], scores[int(.975 * (draws - 1))]]
+
+
+def paired_bootstrap_macro_f1_delta(true: list[str], first: list[str | None],
+                                    second: list[str | None],
+                                    draws: int = BOOTSTRAPS,
+                                    seed: int = SEED) -> dict:
+    """Estimate first-minus-second macro-F1 using identical sampled row IDs."""
+    if not true or len(true) != len(first) or len(true) != len(second) or draws < 2:
+        raise ValueError("paired bootstrap needs nonempty equal-length arrays and >=2 draws")
+    rng = random.Random(seed)
+    n = len(true)
+    differences = []
+    for _ in range(draws):
+        indexes = [rng.randrange(n) for _ in range(n)]
+        sampled_true = [true[i] for i in indexes]
+        differences.append(
+            macro_f1(sampled_true, [first[i] for i in indexes])
+            - macro_f1(sampled_true, [second[i] for i in indexes])
+        )
+    differences.sort()
+    return {
+        "delta_macro_f1": macro_f1(true, first) - macro_f1(true, second),
+        "ci_95_percentile": [differences[int(.025 * (draws - 1))],
+                             differences[int(.975 * (draws - 1))]],
+        "draws": draws, "seed": seed, "resampling_unit": "same May complaint row",
+    }
 
 
 def evaluate(rows: list[dict], pred: list[str | None],
@@ -411,26 +481,34 @@ def run_experiment(zip_path: Path, max_rows: int = MAX_ROWS,
         score = evaluate(validation, predictions)
         tuned.append({"alpha": alpha, "accuracy": score["accuracy"],
                       "macro_f1": score["macro_f1"]})
-    # Validation alone chooses alpha. The May test set is accessed only after this.
+    # This run chooses alpha from April only. May was inspected in prior runs,
+    # so the revision is retrospective and is not an untouched blind test.
     chosen = max(tuned, key=lambda x: (x["macro_f1"], x["accuracy"], -x["alpha"]))
     trained = time.perf_counter()
     test_majority = [majority_label] * len(test)
-    test_rules = [rule_predict(r["text"]) for r in test]
+    test_rule_routes = [rule_route(r["text"]) for r in test]
+    test_rules = [prediction for prediction, _ in test_rule_routes]
+    rule_review_reasons = dict(sorted(Counter(reason for prediction, reason in test_rule_routes
+                                             if prediction is None).items()))
     test_nb = model.predict(test, chosen["alpha"])
+    paired_delta = paired_bootstrap_macro_f1_delta(
+        [r["label"] for r in test], test_nb, test_rules)
     unknown_docs = sum(not any(t in model.vocabulary for t in tokenize(r["text"])) for r in test)
     capped_docs = sum(len(re.findall(r"[a-z]+", r["text"])) > MAX_TOKENS for r in test)
     result = {
         "protocol": {
-            "version": "stage2-v1",
+            "version": "stage2-v4-retrospective",
             "seed": SEED,
-            "source_scope": f"first {max_rows:,} CSV records, matching workbook capacity",
+            "source_scope": (f"first {max_rows:,} CSV records, matching workbook capacity"
+                             if max_rows == MAX_ROWS else f"first {max_rows:,} CSV records"),
             "train_period": "through 2026-03-31",
             "validation_period": "2026-04-01 to 2026-04-30",
             "test_period": "2026-05-01 to 2026-05-31",
             "excluded_prior_trial": "2026-06 and later",
-            "leakage_control": "hash normalized narrative across all months; drop cross-label groups; keep earliest row before time split; train-only vocabulary",
+            "leakage_control": "hash normalized narrative across all months; fix label on first receipt day; exclude same-day cross-label ambiguity; later labels cannot delete earlier observations; keep one first-day row before time split; train-only vocabulary",
+            "may_test_status": "May outcomes were inspected in earlier runs; this is retrospective reanalysis, not a previously untouched test. No alpha tuning on May in this revision.",
             "feature_policy": "narrative only; redaction placeholder tokens removed; max 5000 tokens",
-            "uncertainty": "95% Wilson intervals for rates; 500 paired-row bootstrap replicates for macro-F1",
+            "uncertainty": "95% Wilson intervals for rates; 500 same-row bootstrap replicates for macro-F1 and NB-minus-rule macro-F1 difference",
         },
         "source": {"archive": zip_path.name, "sha256": digest, **audit},
         "data_dictionary": {name: {"meaning": meaning, "model_role": role}
@@ -453,11 +531,17 @@ def run_experiment(zip_path: Path, max_rows: int = MAX_ROWS,
             "majority": evaluate(test, test_majority, True),
             "rules_from_stage1": evaluate(test, test_rules, True),
             "naive_bayes": evaluate(test, test_nb, True),
+            "rules_review_reason_counts": rule_review_reasons,
+            "paired_delta_nb_minus_rules": paired_delta,
         },
         "checks": {
             "hash_overlap_across_splits": 0,
             "vocabulary_fit_rows": len(train),
             "test_used_for_alpha_selection": False,
+            "may_previously_inspected": True,
+            "rule_review_reasons_sum_matches_abstentions": (
+                sum(rule_review_reasons.values()) == sum(p is None for p in test_rules)
+            ),
             "raw_narratives_exported": False,
         },
         "environment": {"python": platform.python_version(), "platform": platform.platform(),
@@ -472,6 +556,8 @@ def run_experiment(zip_path: Path, max_rows: int = MAX_ROWS,
         "six_rows": audit["selected_six_narratives"],
         "dedup_extra_rows": dedup["duplicate_extra_rows"],
         "conflict_groups": dedup["conflicting_label_groups_excluded"],
+        "later_label_disagreement_groups": dedup["later_label_disagreement_groups_kept_first"],
+        "later_label_disagreement_rows": dedup["later_label_disagreement_rows_dropped"],
         "train_n": len(train),
         "val_n": len(validation),
         "test_n": len(test),
@@ -484,7 +570,10 @@ def run_experiment(zip_path: Path, max_rows: int = MAX_ROWS,
         "month_raw_narratives": {m: audit["monthly_selected_six_narratives"].get(m, 0)
                                  for m in ("2026-03", "2026-04", "2026-05", "2026-06")},
         "field_missing": audit["missing_counts"],
+        "six_narrative_length_chars": audit["selected_narrative_length_chars"],
         "chosen_alpha": chosen["alpha"],
+        "rule_review_reason_counts": rule_review_reasons,
+        "paired_delta_nb_minus_rules": paired_delta,
         "models": {
             name: {
                 "accuracy": metrics["accuracy"],
@@ -495,7 +584,8 @@ def run_experiment(zip_path: Path, max_rows: int = MAX_ROWS,
                 "accuracy_ci_95": metrics["accuracy_95_wilson"],
                 "macro_f1_ci_95": metrics["macro_f1_95_bootstrap"],
             }
-            for name, metrics in result["test"].items() if name != "majority_label_from_train"
+            for name, metrics in result["test"].items()
+            if name in ("majority", "rules_from_stage1", "naive_bayes")
         },
     }
     return result

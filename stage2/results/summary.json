@@ -1,15 +1,16 @@
 {
   "protocol": {
-    "version": "stage2-v1",
+    "version": "stage2-v4-retrospective",
     "seed": 42,
     "source_scope": "first 1,048,575 CSV records, matching workbook capacity",
     "train_period": "through 2026-03-31",
     "validation_period": "2026-04-01 to 2026-04-30",
     "test_period": "2026-05-01 to 2026-05-31",
     "excluded_prior_trial": "2026-06 and later",
-    "leakage_control": "hash normalized narrative across all months; drop cross-label groups; keep earliest row before time split; train-only vocabulary",
+    "leakage_control": "hash normalized narrative across all months; fix label on first receipt day; exclude same-day cross-label ambiguity; later labels cannot delete earlier observations; keep one first-day row before time split; train-only vocabulary",
+    "may_test_status": "May outcomes were inspected in earlier runs; this is retrospective reanalysis, not a previously untouched test. No alpha tuning on May in this revision.",
     "feature_policy": "narrative only; redaction placeholder tokens removed; max 5000 tokens",
-    "uncertainty": "95% Wilson intervals for rates; 500 paired-row bootstrap replicates for macro-F1"
+    "uncertainty": "95% Wilson intervals for rates; 500 same-row bootstrap replicates for macro-F1 and NB-minus-rule macro-F1 difference"
   },
   "source": {
     "archive": "complaints.csv.zip",
@@ -240,7 +241,23 @@
       "2026-06": 1025
     },
     "selected_redaction_marker_rows": 11636,
-    "selected_over_20000_chars": 9
+    "selected_over_20000_chars": 9,
+    "selected_narrative_length_chars": {
+      "basis": "casefolded, whitespace-normalized narrative",
+      "n": 14919,
+      "median": 991,
+      "p95": 3484,
+      "p99": 6397,
+      "max": 31877,
+      "bins": {
+        "<200": 895,
+        "200-499": 2998,
+        "500-999": 3609,
+        "1000-1999": 4636,
+        "2000-4999": 2482,
+        ">=5000": 299
+      }
+    }
   },
   "data_dictionary": {
     "Date received": {
@@ -311,9 +328,14 @@
   "deduplication": {
     "normalized_text_groups": 13415,
     "duplicate_extra_rows": 1504,
-    "conflicting_label_groups_excluded": 1,
-    "conflicting_rows_excluded": 2,
-    "unique_nonconflicting_rows": 13414
+    "conflicting_label_groups_excluded": 0,
+    "conflicting_rows_excluded": 0,
+    "earliest_day_conflicting_groups_excluded": 0,
+    "earliest_day_conflicting_rows_excluded": 0,
+    "later_label_disagreement_groups_kept_first": 1,
+    "later_label_disagreement_rows_dropped": 1,
+    "first_observation_policy": "first receipt day fixes the label; same-day cross-label ambiguity excludes group; later labels cannot remove earlier group",
+    "unique_first_observation_rows": 13415
   },
   "splits": {
     "train": {
@@ -330,7 +352,7 @@
       }
     },
     "validation": {
-      "n": 6111,
+      "n": 6112,
       "date_min": "2026-04-01",
       "date_max": "2026-04-30",
       "class_counts": {
@@ -339,7 +361,7 @@
         "Credit card": 1360,
         "Money transfer, virtual currency, or money service": 729,
         "Mortgage": 512,
-        "Credit reporting or other personal consumer reports": 219
+        "Credit reporting or other personal consumer reports": 220
       }
     },
     "test": {
@@ -376,18 +398,18 @@
   "validation_alpha_scores": [
     {
       "alpha": 0.1,
-      "accuracy": 0.74357715594829,
-      "macro_f1": 0.7159692348891246
+      "accuracy": 0.743619109947644,
+      "macro_f1": 0.7162025712926737
     },
     {
       "alpha": 1.0,
-      "accuracy": 0.7479954180985109,
-      "macro_f1": 0.7169355815929533
+      "accuracy": 0.7480366492146597,
+      "macro_f1": 0.7171977374596579
     },
     {
       "alpha": 5.0,
-      "accuracy": 0.6962853870070365,
-      "macro_f1": 0.5347197516958193
+      "accuracy": 0.6961714659685864,
+      "macro_f1": 0.534621703148081
     }
   ],
   "test": {
@@ -745,12 +767,29 @@
         0.697419512065423,
         0.7361573839322858
       ]
+    },
+    "rules_review_reason_counts": {
+      "ambiguous": 118,
+      "no_rule_match": 1011,
+      "too_long": 6
+    },
+    "paired_delta_nb_minus_rules": {
+      "delta_macro_f1": 0.2355444223299356,
+      "ci_95_percentile": [
+        0.21215197625201926,
+        0.25934351825786855
+      ],
+      "draws": 500,
+      "seed": 42,
+      "resampling_unit": "same May complaint row"
     }
   },
   "checks": {
     "hash_overlap_across_splits": 0,
     "vocabulary_fit_rows": 3615,
     "test_used_for_alpha_selection": false,
+    "may_previously_inspected": true,
+    "rule_review_reasons_sum_matches_abstentions": true,
     "raw_narratives_exported": false
   },
   "environment": {
@@ -759,18 +798,20 @@
     "dependencies": "Python standard library only"
   },
   "runtime_seconds": {
-    "hash_and_scan": 9.455,
-    "dedup_fit_validation": 5.011,
-    "total": 23.688
+    "hash_and_scan": 11.667,
+    "dedup_fit_validation": 6.938,
+    "total": 35.225
   },
   "report": {
     "source_rows": 1048575,
     "narrative_rows": 17093,
     "six_rows": 14919,
     "dedup_extra_rows": 1504,
-    "conflict_groups": 1,
+    "conflict_groups": 0,
+    "later_label_disagreement_groups": 1,
+    "later_label_disagreement_rows": 1,
     "train_n": 3615,
-    "val_n": 6111,
+    "val_n": 6112,
     "test_n": 2742,
     "june_excluded_n": 946,
     "train_classes": {
@@ -787,7 +828,7 @@
       "Credit card": 1360,
       "Money transfer, virtual currency, or money service": 729,
       "Mortgage": 512,
-      "Credit reporting or other personal consumer reports": 219
+      "Credit reporting or other personal consumer reports": 220
     },
     "test_classes": {
       "Debt collection": 772,
@@ -837,7 +878,38 @@
       "Timely response?": 0,
       "Complaint ID": 2390
     },
+    "six_narrative_length_chars": {
+      "basis": "casefolded, whitespace-normalized narrative",
+      "n": 14919,
+      "median": 991,
+      "p95": 3484,
+      "p99": 6397,
+      "max": 31877,
+      "bins": {
+        "<200": 895,
+        "200-499": 2998,
+        "500-999": 3609,
+        "1000-1999": 4636,
+        "2000-4999": 2482,
+        ">=5000": 299
+      }
+    },
     "chosen_alpha": 1.0,
+    "rule_review_reason_counts": {
+      "ambiguous": 118,
+      "no_rule_match": 1011,
+      "too_long": 6
+    },
+    "paired_delta_nb_minus_rules": {
+      "delta_macro_f1": 0.2355444223299356,
+      "ci_95_percentile": [
+        0.21215197625201926,
+        0.25934351825786855
+      ],
+      "draws": 500,
+      "seed": 42,
+      "resampling_unit": "same May complaint row"
+    },
     "models": {
       "majority": {
         "accuracy": 0.2815463165572575,

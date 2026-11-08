@@ -10,8 +10,8 @@ from pathlib import Path
 
 from stage2 import (
     CountNaiveBayes, PRODUCTS, deduplicate, evaluate, iter_source, normalize,
-    parse_received, rule_predict, run_experiment, scan_source, split_rows,
-    tokenize, wilson,
+    paired_bootstrap_macro_f1_delta, parse_received, rule_predict, rule_route,
+    run_experiment, scan_source, split_rows, tokenize, wilson,
 )
 
 
@@ -64,9 +64,10 @@ class Stage2Tests(unittest.TestCase):
             self.assertEqual(audit["invalid_received_dates"], 1)
             self.assertEqual(audit["selected_six_narratives"], 1)
             self.assertEqual(audit["monthly_selected_six_narratives"], {"2026-03": 1})
+            self.assertEqual(audit["selected_narrative_length_chars"]["n"], 1)
             self.assertEqual(len(candidates), 1)
 
-    def test_dedup_keeps_earliest_and_excludes_conflicting_group(self):
+    def test_later_label_disagreement_cannot_remove_earlier_training_row(self):
         candidates = [
             {"hash": "same", "text": "example", "label": PRODUCTS[0], "date": date(2026, 5, 1), "id": "2"},
             {"hash": "same", "text": "example", "label": PRODUCTS[0], "date": date(2026, 3, 1), "id": "1"},
@@ -74,10 +75,24 @@ class Stage2Tests(unittest.TestCase):
             {"hash": "conflict", "text": "different", "label": PRODUCTS[1], "date": date(2026, 4, 1), "id": "4"},
         ]
         kept, stats = deduplicate(candidates)
-        self.assertEqual([r["id"] for r in kept], ["1"])
+        self.assertEqual([r["id"] for r in kept], ["1", "3"])
         self.assertEqual(stats["duplicate_extra_rows"], 2)
-        self.assertEqual(stats["conflicting_label_groups_excluded"], 1)
-        self.assertEqual(stats["conflicting_rows_excluded"], 2)
+        self.assertEqual(stats["conflicting_label_groups_excluded"], 0)
+        self.assertEqual(stats["later_label_disagreement_groups_kept_first"], 1)
+        self.assertEqual(stats["later_label_disagreement_rows_dropped"], 1)
+        splits, _ = split_rows(kept)
+        self.assertEqual({r["id"] for r in splits["train"]}, {"1", "3"})
+
+    def test_first_day_cross_label_conflict_excludes_group_without_future_label(self):
+        candidates = [
+            {"hash": "ambiguous", "text": "same", "label": PRODUCTS[0], "date": date(2026, 3, 1), "id": "1"},
+            {"hash": "ambiguous", "text": "same", "label": PRODUCTS[1], "date": date(2026, 3, 1), "id": "2"},
+            {"hash": "ambiguous", "text": "same", "label": PRODUCTS[0], "date": date(2026, 5, 1), "id": "3"},
+        ]
+        kept, stats = deduplicate(candidates)
+        self.assertEqual(kept, [])
+        self.assertEqual(stats["earliest_day_conflicting_groups_excluded"], 1)
+        self.assertEqual(stats["earliest_day_conflicting_rows_excluded"], 3)
 
     def test_group_first_temporal_split_prevents_duplicate_leakage(self):
         candidates = [
@@ -126,6 +141,18 @@ class Stage2Tests(unittest.TestCase):
 
     def test_rule_baseline_preserves_ambiguous_review(self):
         self.assertIsNone(rule_predict("my mortgage and debt are both listed incorrectly"))
+        self.assertEqual(rule_route("my mortgage and debt are both listed incorrectly")[1],
+                         "ambiguous")
+
+    def test_paired_bootstrap_uses_same_rows_and_fixed_seed(self):
+        true = [PRODUCTS[0], PRODUCTS[0], PRODUCTS[4], PRODUCTS[4], PRODUCTS[1], PRODUCTS[1]]
+        nb = list(true)
+        rules = [PRODUCTS[0], None, PRODUCTS[4], None, PRODUCTS[1], None]
+        first = paired_bootstrap_macro_f1_delta(true, nb, rules, draws=100, seed=7)
+        again = paired_bootstrap_macro_f1_delta(true, nb, rules, draws=100, seed=7)
+        self.assertEqual(first, again)
+        self.assertGreater(first["delta_macro_f1"], 0)
+        self.assertGreaterEqual(first["ci_95_percentile"][0], 0)
 
     def test_wilson_interval_handles_empty_and_bounds(self):
         self.assertIsNone(wilson(0, 0))
